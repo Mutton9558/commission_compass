@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 void main() {
   runApp(const MyApp());
@@ -19,13 +19,71 @@ class MyApp extends StatelessWidget {
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(),
+      home: const CommissionCompassPage(),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
+class CommissionCompassBody extends StatelessWidget {
+  const CommissionCompassBody({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      spacing: 15,
+      children: [
+        Transform.translate(
+          offset: const Offset(0.0, 0.0),
+          child: Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.grey[400],
+            ),
+          ),
+        ),
+        Column(
+          children: [
+            Text("How can I help you decide?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
+            Text("Ask me about any freelance commission or opportunity"),
+          ]
+        ),
+
+
+        Row(
+          spacing: 15,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 250,
+              child: TextField(
+                obscureText: false,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            FilledButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.send),
+              label: Text("Send"),
+              style: IconButton.styleFrom(
+              backgroundColor: Colors.grey[400],
+              foregroundColor: Colors.black,
+              padding: EdgeInsets.all(16)
+            ),)
+          ],
+        )
+
+      ],
+    );
+  }
+}
+
+class CommissionCompassPage extends StatelessWidget {
+  const CommissionCompassPage({super.key});
 
   double returnFontSize(){
     if (kIsWeb){
@@ -46,7 +104,7 @@ class MyHomePage extends StatelessWidget {
             Text(
               "Commission Compass",
                 style: TextStyle(
-                  fontSize: returnFontSize(), 
+                  fontSize: returnFontSize(),
                   fontWeight: FontWeight(800)),
             ),
             Transform.translate(
@@ -102,7 +160,7 @@ class MyHomePage extends StatelessWidget {
                         semanticsLabel: 'New Chat',
                       )
                     )
-                  ] 
+                  ]
                 )
               )
             )
@@ -113,6 +171,7 @@ class MyHomePage extends StatelessWidget {
         shadowColor: Colors.black,
         backgroundColor: Colors.white,
       ),
+      body: Center(child: CommissionCompassBody()),
     );
   }
 }
