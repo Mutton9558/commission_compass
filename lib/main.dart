@@ -33,24 +33,12 @@ class CommissionCompassBody extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       spacing: 15,
       children: [
-        Transform.translate(
-          offset: const Offset(0.0, 0.0),
-          child: Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.grey[400],
-            ),
-          ),
-        ),
         Column(
           children: [
             Text("How can I help you decide?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
             Text("Ask me about any freelance commission or opportunity"),
           ]
         ),
-
 
         Row(
           spacing: 15,
