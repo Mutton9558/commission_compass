@@ -6,6 +6,28 @@ void main() {
   runApp(const MyApp());
 }
 
+class MessageBoxClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    double tipHeight = 10.0;
+    
+    // Draw the main rectangle body
+    path.addRRect(RRect.fromLTRBR(0, 0, size.width, size.height - tipHeight, Radius.circular(12)));
+    
+    // Draw the triangular tail at the bottom
+    path.moveTo((3*size.width)/4 + 10, size.height - tipHeight);
+    path.lineTo((3*size.width)/4 + 20, size.height);
+    path.lineTo((3*size.width)/4 + 30, size.height - tipHeight);
+    path.close();
+    
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -50,7 +72,7 @@ class MyHomePage extends StatelessWidget {
                   fontWeight: FontWeight(800)),
             ),
             Transform.translate(
-              offset: const Offset(3.0, 0.0), // Shifting 2 pixels to the left
+              offset: const Offset(1.0, 0.0),
               child: const Text("AI-powered commission decision assistant", style: TextStyle(fontSize: 10),),
             )
             // Text(
@@ -77,7 +99,7 @@ class MyHomePage extends StatelessWidget {
 
         actions: [
           Transform.translate(
-            offset: Offset(-15, 0),
+            offset: Offset(-17, 0),
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               child: Container(
@@ -113,6 +135,100 @@ class MyHomePage extends StatelessWidget {
         shadowColor: Colors.black,
         backgroundColor: Colors.white,
       ),
+
+      // AI response body (convert to widget class later)
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // user's prompt
+            Padding(
+              padding: const EdgeInsets.only(right: 10, top: 40),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: ClipPath(
+                  clipper: MessageBoxClipper(),
+                  child: Container(
+                    width: 180,
+                    padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 26),
+                    color: Colors.blue,
+                    child: Text("Question 1 dadxasdasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"),
+                  ),
+                )
+              ),
+            ),
+            
+            // AI response
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: 60),
+              child: Text("Final Decision: Decision B! 🔥", style: TextStyle(fontSize: 24, fontWeight: FontWeight(800)),)
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: 40),
+              child: Text("Key Reasoning 💻", style: TextStyle(fontSize: 20, fontWeight: FontWeight(600)),)
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: 10),
+              child: Text("bla bla bla bla bla", style: TextStyle(fontSize: 16))
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: 40),
+              child: Text("Pros and Cons 🥶", style: TextStyle(fontSize: 20, fontWeight: FontWeight(600)),)
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: 10),
+              child: Table(
+                defaultColumnWidth: FixedColumnWidth(150), 
+                // columnWidths: const {
+                //   0: FlexColumnWidth(1),
+                //   1: FlexColumnWidth(1),
+                // },
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle, 
+                border: TableBorder.all(color: Colors.black, width: 1),
+                children: [
+                  TableRow(
+                    children: [
+                      Center(child: Text("Pros")),
+                      Center(child: Text("Cons"))
+                    ]
+                  ),
+
+                  TableRow(
+                    children: [
+                      Center(child: Text("bla bla bla")),
+                      Center(child: Text("bla bla bla"))
+                    ]
+                  ),
+                ],
+              )
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: 40),
+              child: Text("Quantifiable Impacts on You 🫵", style: TextStyle(fontSize: 20, fontWeight: FontWeight(600)),)
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: 10),
+              child: Text("bla bla bla bla bla", style: TextStyle(fontSize: 16))
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: 40),
+              child: Text("Suggestions 🤑", style: TextStyle(fontSize: 20, fontWeight: FontWeight(600)),)
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: 10),
+              child: Text("bla bla bla bla bla", style: TextStyle(fontSize: 16))
+            ),
+          ],
+        ),
+      )
     );
   }
 }
