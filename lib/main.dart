@@ -28,6 +28,22 @@ class MessageBoxClipper extends CustomClipper<Path> {
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
 
+class LineSeparator extends CustomClipper<Path>{
+  @override
+  Path getClip(Size size){
+    Path path = Path();
+
+    path.addRRect(RRect.fromLTRBR(0, 0, size.width, size.height, Radius.circular(0)));
+
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -46,6 +62,173 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// each sub section of the ai response (after the final decision section)
+class ResponseSection extends StatelessWidget{
+  final String header;
+  final dynamic response;
+
+  const ResponseSection({super.key, required this.header, required this.response});
+
+  dynamic responseBody(){
+    if(response is String){
+      return(
+        Padding(
+          padding: EdgeInsets.only(left: 10, top: 10, bottom: 20),
+          child: Text(response, style: TextStyle(fontSize: 16))
+        )
+      );
+    }
+    return response;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return(
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: 10, top: 20),
+            child: Text(header, style: TextStyle(fontSize: 20, fontWeight: FontWeight(600)),)
+          ),
+
+          responseBody(),
+
+          ClipPath(
+            clipper: LineSeparator(),
+            child: 
+            Padding(
+              padding: EdgeInsets.only(left: 10, right: 10),
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 1,
+                color: Colors.grey[300]
+              ),
+            )
+          ),
+        ],
+      )
+    );
+  }
+}
+
+// main class of the ai response
+// add more parameters later on for AI responses
+class AIResponse extends StatelessWidget{
+  final String userPrompt;
+  final String keyReasoningContent;
+  final List<String> prosList;
+  final List<String> consList;
+  final String quantifiableImpactContent;
+  final String suggestionsContent;
+
+  const AIResponse({
+    super.key, 
+    required this.userPrompt, 
+    required this.keyReasoningContent, 
+    required this.prosList,
+    required this.consList,
+    required this.quantifiableImpactContent,
+    required this.suggestionsContent
+  });
+
+  TableRow prosAndConsList(){
+    String prosString = "";
+    String consString = "";
+    for (var pros in prosList) {
+      prosString += '\u2022 $pros\n';
+    }
+
+    for (var cons in consList){
+      consString += '\u2022 $cons\n';
+    }
+    
+    return TableRow(
+      children: [
+        Center(child: Text(prosString)),
+        Center(child: Text(consString))
+      ]
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return(
+      SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // user's prompt
+            Padding(
+              padding: const EdgeInsets.only(right: 10, top: 40),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: ClipPath(
+                  clipper: MessageBoxClipper(),
+                  child: Container(
+                    width: 180,
+                    padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 26),
+                    color: Colors.blue,
+                    child: Text(userPrompt),
+                  ),
+                )
+              ),
+            ),
+            
+            // AI response
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: 40, bottom: 20),
+              child: Text("Final Decision: Decision B! 🔥", style: TextStyle(fontSize: 22, fontWeight: FontWeight(800)),)
+            ),
+
+            ClipPath(
+              clipper: LineSeparator(),
+              child: 
+              Padding(
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 1,
+                  color: Colors.grey[300]
+                ),
+              )
+            ),
+
+            ResponseSection(header: "Key Reasoning 💻", response: "bla bla bla bla bla"),
+            ResponseSection(
+              header: "Pros and Cons 🥶", 
+              response: Padding(
+                padding: EdgeInsets.only(left: 10, top: 10, bottom: 20),
+                child: Table(
+                  defaultColumnWidth: FixedColumnWidth(150), 
+                  // columnWidths: const {
+                  //   0: FlexColumnWidth(1),
+                  //   1: FlexColumnWidth(1),
+                  // },
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle, 
+                  border: TableBorder.all(color: Colors.black, width: 1),
+                  children: [
+                    TableRow(
+                      children: [
+                        Center(child: Text("Pros")),
+                        Center(child: Text("Cons"))
+                      ]
+                    ),
+
+                    prosAndConsList()
+                  ],
+                )
+              ),
+            ),
+            ResponseSection(header: "Quantifiable Impacts on You 🫵", response: "bla bla bla bla bla"),
+            ResponseSection(header: "Suggestions 🤑", response: "bla bla bla bla bla")
+          ],
+        ),
+      )
+    );
+  }
+}
+
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
 
@@ -60,6 +243,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context){
     return Scaffold(
+      backgroundColor: const Color(0xFFEFF6FF),
       appBar: AppBar(
         toolbarHeight: 80,
         title: Column(
@@ -136,99 +320,8 @@ class MyHomePage extends StatelessWidget {
         backgroundColor: Colors.white,
       ),
 
-      // AI response body (convert to widget class later)
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // user's prompt
-            Padding(
-              padding: const EdgeInsets.only(right: 10, top: 40),
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: ClipPath(
-                  clipper: MessageBoxClipper(),
-                  child: Container(
-                    width: 180,
-                    padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 26),
-                    color: Colors.blue,
-                    child: Text("Question 1 dadxasdasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"),
-                  ),
-                )
-              ),
-            ),
-            
-            // AI response
-            Padding(
-              padding: EdgeInsets.only(left: 10, top: 60),
-              child: Text("Final Decision: Decision B! 🔥", style: TextStyle(fontSize: 24, fontWeight: FontWeight(800)),)
-            ),
-
-            Padding(
-              padding: EdgeInsets.only(left: 10, top: 40),
-              child: Text("Key Reasoning 💻", style: TextStyle(fontSize: 20, fontWeight: FontWeight(600)),)
-            ),
-
-            Padding(
-              padding: EdgeInsets.only(left: 10, top: 10),
-              child: Text("bla bla bla bla bla", style: TextStyle(fontSize: 16))
-            ),
-
-            Padding(
-              padding: EdgeInsets.only(left: 10, top: 40),
-              child: Text("Pros and Cons 🥶", style: TextStyle(fontSize: 20, fontWeight: FontWeight(600)),)
-            ),
-
-            Padding(
-              padding: EdgeInsets.only(left: 10, top: 10),
-              child: Table(
-                defaultColumnWidth: FixedColumnWidth(150), 
-                // columnWidths: const {
-                //   0: FlexColumnWidth(1),
-                //   1: FlexColumnWidth(1),
-                // },
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle, 
-                border: TableBorder.all(color: Colors.black, width: 1),
-                children: [
-                  TableRow(
-                    children: [
-                      Center(child: Text("Pros")),
-                      Center(child: Text("Cons"))
-                    ]
-                  ),
-
-                  TableRow(
-                    children: [
-                      Center(child: Text("bla bla bla")),
-                      Center(child: Text("bla bla bla"))
-                    ]
-                  ),
-                ],
-              )
-            ),
-
-            Padding(
-              padding: EdgeInsets.only(left: 10, top: 40),
-              child: Text("Quantifiable Impacts on You 🫵", style: TextStyle(fontSize: 20, fontWeight: FontWeight(600)),)
-            ),
-
-            Padding(
-              padding: EdgeInsets.only(left: 10, top: 10),
-              child: Text("bla bla bla bla bla", style: TextStyle(fontSize: 16))
-            ),
-
-            Padding(
-              padding: EdgeInsets.only(left: 10, top: 40),
-              child: Text("Suggestions 🤑", style: TextStyle(fontSize: 20, fontWeight: FontWeight(600)),)
-            ),
-
-            Padding(
-              padding: EdgeInsets.only(left: 10, top: 10),
-              child: Text("bla bla bla bla bla", style: TextStyle(fontSize: 16))
-            ),
-          ],
-        ),
-      )
+      // AI response class (just for testing remove before prod)
+      body: AIResponse(userPrompt: "Yusuf or Elsa", keyReasoningContent: "bla baadadasdandjand", prosList: ["yusuf", "jason"], consList: ["shawn"], quantifiableImpactContent: "bla vla bla bla m,arcus", suggestionsContent: "we are one team fr fr") 
     );
   }
 }
