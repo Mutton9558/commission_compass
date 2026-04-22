@@ -6,6 +6,22 @@ void main() {
   runApp(const MyApp());
 }
 
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Commission Compass',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      ),
+      debugShowCheckedModeBanner: false,
+      home: const CommissionCompassPage(),
+    );
+  }
+}
+
 class MessageBoxClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -44,26 +60,11 @@ class LineSeparator extends CustomClipper<Path>{
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  // Yusuf will we only have one page?
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Commission Compass',
-      theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      debugShowCheckedModeBanner: false,
-      home: const CommissionCompassPage(),
-    );
-  }
-}
-
 class CommissionCompassBody extends StatelessWidget {
-  const CommissionCompassBody({super.key});
+  final TextEditingController controller;
+  final VoidCallback onSend;
+
+  const CommissionCompassBody({super.key, required this.controller, required this.onSend});
 
   @override
   Widget build(BuildContext context) {
@@ -90,14 +91,14 @@ class CommissionCompassBody extends StatelessWidget {
                 SizedBox(
                   width: 250,
                   child: TextField(
-                    obscureText: false,
+                    controller: controller,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                     ),
                   ),
                 ),
                 FilledButton.icon(
-                  onPressed: () {},
+                  onPressed: onSend,
                   icon: Icon(Icons.send),
                   label: Text("Send"),
                   style: IconButton.styleFrom(
@@ -107,8 +108,6 @@ class CommissionCompassBody extends StatelessWidget {
                 ),)
               ],
             ),
-            
-            AIResponse(userPrompt: "Yusuf or Elsa", keyReasoningContent: "bla baadadasdandjand", prosList: ["yusuf", "jason"], consList: ["shawn"], quantifiableImpactContent: "bla vla bla bla m,arcus", suggestionsContent: "we are one team fr fr") 
           ],
         ))
       )
@@ -246,7 +245,7 @@ class AIResponse extends StatelessWidget{
               )
             ),
 
-            ResponseSection(header: "Key Reasoning 💻", response: "bla bla bla bla bla"),
+            ResponseSection(header: "Key Reasoning 💻", response: keyReasoningContent),
             ResponseSection(
               header: "Pros and Cons 🥶", 
               response: Padding(
@@ -272,16 +271,24 @@ class AIResponse extends StatelessWidget{
                 )
               ),
             ),
-            ResponseSection(header: "Quantifiable Impacts on You 🫵", response: "bla bla bla bla bla"),
-            ResponseSection(header: "Suggestions 🤑", response: "bla bla bla bla bla")
+            ResponseSection(header: "Quantifiable Impacts on You 🫵", response: quantifiableImpactContent),
+            ResponseSection(header: "Suggestions 🤑", response: suggestionsContent)
           ],
         )
     );
   }
 }
 
-class CommissionCompassPage extends StatelessWidget {
+class CommissionCompassPage extends StatefulWidget {
   const CommissionCompassPage({super.key});
+
+  @override
+  State<CommissionCompassPage> createState() => _CommissionCompassPageState();
+}
+
+class _CommissionCompassPageState extends State<CommissionCompassPage> {
+  bool _showResponse = false;
+  final TextEditingController _promptController = TextEditingController();
 
   double returnFontSize(){
     if (kIsWeb){
@@ -337,29 +344,37 @@ class CommissionCompassPage extends StatelessWidget {
             offset: Offset(-17, 0),
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
-              child: Container(
-                width: 100,
-                height: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.grey[400]
-                ),
-                alignment: Alignment.center,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("New chat", style: TextStyle(fontSize: 12)),
-                    Transform.translate(
-                      offset: Offset(5, 0),
-                      child: SvgPicture.asset(
-                        'assets/message-plus.svg',
-                        width: 30,
-                        height: 30,
-                        semanticsLabel: 'New Chat',
-                      )
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showResponse = false;
+                    _promptController.clear();
+                  });
+                },
+                child: Container(
+                    width: 100,
+                    height: 40,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey[400]
+                    ),
+                    alignment: Alignment.center,
+                    child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("New chat", style: TextStyle(fontSize: 12)),
+                          Transform.translate(
+                              offset: Offset(5, 0),
+                              child: SvgPicture.asset(
+                                'assets/message-plus.svg',
+                                width: 30,
+                                height: 30,
+                                semanticsLabel: 'New Chat',
+                              )
+                          )
+                        ]
                     )
-                  ]
                 )
               )
             )
@@ -370,7 +385,16 @@ class CommissionCompassPage extends StatelessWidget {
         shadowColor: Colors.black,
         backgroundColor: Colors.white,
       ),
-      body: Center(child: CommissionCompassBody()),
+      body: Center(
+        child: _showResponse ? SingleChildScrollView(
+          child: AIResponse(userPrompt: _promptController.text, keyReasoningContent: "Based on your input...", prosList: const ["shawn", "jason"], consList: const ["yusuf", "yusuf"], quantifiableImpactContent: "67 67 67 67 67", suggestionsContent: "elsa is here")
+        ): CommissionCompassBody(controller: _promptController, onSend: () {
+              if (_promptController.text.isNotEmpty) {
+                setState(() => _showResponse = true);
+              }
+            },
+          )
+      )
     );
   }
 }
